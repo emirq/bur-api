@@ -22,3 +22,30 @@ docker run --rm \
 # Test
 
 ``` ./vendor/bin/sail test ```
+
+
+# Endpoints
+
+
+### Get all Todos
+
+``` GET /todos ```
+
+### Retrieve a list of all Todos.
+
+### Response
+```
+[
+    {
+        "id": 1,
+        "title": "Example Todo",
+        "description": "This is an example todo.",
+        "status": "pending"
+    },
+    {
+        "id": 2,
+        "title": "Another Todo",
+        "description": null,
+        "status": "completed"
+    }
+]

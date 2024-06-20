@@ -1,0 +1,170 @@
+openapi: 3.0.0
+info:
+  title: 'Todo API'
+  description: 'This is a Todo App Documentation'
+  version: 1.0.0
+paths:
+  /api/todos:
+    get:
+      tags:
+        - Todos
+      summary: 'Get list of todos'
+      description: 'Retrieve a list of all todos'
+      operationId: dd687d49d7f86d473ce56a7806776fc4
+      responses:
+        '200':
+          description: 'List of todos'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+    post:
+      tags:
+        - Todos
+      summary: 'Create a new todo'
+      description: 'Create a new todo item'
+      operationId: 6f5da079c2dace66df52625276205a32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - title
+                - status
+              properties:
+                title:
+                  type: string
+                  example: 'New Todo'
+                description:
+                  type: string
+                  example: 'This is a new todo item'
+                  nullable: true
+                status:
+                  type: string
+                  enum: [pending, completed]
+                  example: pending
+              type: object
+      responses:
+        '201':
+          description: 'Todo created successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '422':
+          description: 'Validation error'
+  '/api/todos/{id}':
+    get:
+      tags:
+        - Todos
+      summary: 'Get a specific todo'
+      description: 'Retrieve a specific todo item by ID'
+      operationId: 5ee0e89cdc77f538ae94769b0b5cfae1
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'The specified todo'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: 'Todo not found'
+    put:
+      tags:
+        - Todos
+      summary: 'Update a specific todo'
+      description: 'Update a specific todo item by ID'
+      operationId: 0e5cec090fe772f5dcb769dd9e38717c
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                title:
+                  type: string
+                  example: 'Updated Todo'
+                description:
+                  type: string
+                  example: 'This is an updated todo item'
+                  nullable: true
+                status:
+                  type: string
+                  enum: [pending, completed]
+                  example: completed
+              type: object
+      responses:
+        '200':
+          description: 'Todo updated successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '422':
+          description: 'Validation error'
+        '404':
+          description: 'Todo not found'
+    delete:
+      tags:
+        - Todos
+      summary: 'Delete a specific todo'
+      description: 'Delete a specific todo item by ID'
+      operationId: 2f51ac0f120b8a6c7a8092bbd18174f4
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: 'Todo deleted successfully'
+        '404':
+          description: 'Todo not found'
+components:
+  schemas:
+    Todo:
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: 'My Todo'
+        description:
+          type: string
+          example: 'This is a description'
+          nullable: true
+        status:
+          type: string
+          enum:
+            - pending
+            - completed
+          example: pending
+        created_at:
+          type: string
+          format: date-time
+          example: '2022-01-01T00:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2022-01-01T00:00:00Z'
+      type: object
