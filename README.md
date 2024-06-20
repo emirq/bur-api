@@ -41,4 +41,4 @@ docker run --rm \
 
 # API Documentation
 
-``` http://localhost/api-docs ```
+``` http://localhost ```
