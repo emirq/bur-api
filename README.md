@@ -1,5 +1,9 @@
 # Installation
 
+## After git clone
+
+``` cd todo-app ```
+
 ## 1. Composer install
 
 ```
@@ -10,8 +14,6 @@ docker run --rm \
     laravelsail/php83-composer:latest \
     composer install --ignore-platform-reqs
 ```
-
-``` cd todo-app ```
 
 ## 2. Create and start containers
 
