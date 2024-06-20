@@ -11,6 +11,8 @@ docker run --rm \
     composer install --ignore-platform-reqs
 ```
 
+``` cd todo-app ```
+
 ## 2. Create and start containers
 
 ``` ./vendor/bin/sail up -d ```
@@ -24,28 +26,6 @@ docker run --rm \
 ``` ./vendor/bin/sail test ```
 
 
-# Endpoints
+# API Documentation
 
-
-### Get all Todos
-
-``` GET /todos ```
-
-### Retrieve a list of all Todos.
-
-### Response
-```
-[
-    {
-        "id": 1,
-        "title": "Example Todo",
-        "description": "This is an example todo.",
-        "status": "pending"
-    },
-    {
-        "id": 2,
-        "title": "Another Todo",
-        "description": null,
-        "status": "completed"
-    }
-]
+``` http://localhost/api-docs ```
