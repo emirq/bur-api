@@ -4,119 +4,169 @@ namespace Tests\Unit;
 
 use App\Models\Todo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\JsonResponse;
 use Tests\TestCase;
 
 class TodoTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * Test retrieving all todos.
-     *
-     * @return void
-     */
-    public function test_can_retrieve_all_todos()
+    public function test_it_returns_all_todos()
     {
-        Todo::factory()->count(5)->create();
+        // Arrange
+        \App\Models\Todo::factory()->count(3)->create();
 
-        $response = $this->getJson('/api/todos');
+        // Act
+        $response = $this->get('/api/todos');
 
+        // Assert
         $response->assertStatus(200)
-            ->assertJsonCount(5);
+            ->assertJson([
+                'success' => true,
+                'message' => null,
+            ])
+            ->assertJsonCount(3);
     }
 
-    /**
-     * Test creating a new todo.
-     *
-     * @return void
-     */
-    public function test_can_create_todo()
+    public function test_it_creates_a_new_todo_successfully()
     {
-        $todoData = [
-            'title' => 'Test Todo',
-            'description' => 'Test Description',
+        $data = [
+            'title' => 'New Todo',
+            'description' => 'This is a new todo item',
             'status' => 'pending',
         ];
 
-        $response = $this->postJson('/api/todos', $todoData);
+        $response = $this->postJson('/api/todos', $data);
 
-        $response->assertStatus(201)
-            ->assertJsonFragment($todoData);
+        $response->assertStatus(JsonResponse::HTTP_CREATED)
+            ->assertJson([
+                'success' => true,
+                'message' => null,
+                'data' => $data,
+            ]);
 
-        $this->assertDatabaseHas('todos', $todoData);
+        $this->assertDatabaseHas('todos', $data);
     }
 
-    /**
-     * Test retrieving a single todo.
-     *
-     * @return void
-     */
-    public function test_can_retrieve_single_todo()
+    public function test_it_validates_required_fields_on_store()
     {
-        $todo = Todo::factory()->create();
+        $data = [
+            // 'title' is intentionally missing
+            'description' => 'This is a new todo item',
+            'status' => 'pending',
+        ];
 
-        $response = $this->getJson('/api/todos/' . $todo->id);
+        $response = $this->postJson('/api/todos', $data);
 
-        $response->assertStatus(200)
-            ->assertJson($todo->toArray());
+        $response->assertStatus(JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors('title');
     }
 
-    /**
-     * Test updating a todo.
-     *
-     * @return void
-     */
-    public function test_can_update_todo()
+    public function test_it_shows_existing_todo()
     {
-        $todo = Todo::factory()->create();
+        $todo = \App\Models\Todo::factory()->create();
 
-        $updatedData = [
-            'title' => 'Updated Title',
-            'description' => 'Updated Description',
+        $response = $this->get("/api/todos/$todo->id");
+
+        $response->assertStatus(JsonResponse::HTTP_OK)
+            ->assertJson([
+                'success' => true,
+                'message' => null,
+                'data' => [
+                    'id' => $todo->id,
+                    'title' => $todo->title,
+                    'description' => $todo->description,
+                    'status' => $todo->status,
+                ],
+            ]);
+    }
+
+    public function test_it_returns_not_found_if_todo_not_exists()
+    {
+        $id = 123;
+
+        $response = $this->get("/api/todos/$id");
+
+        $response->assertStatus(JsonResponse::HTTP_NOT_FOUND)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Todo not found',
+            ]);
+    }
+
+    public function test_it_updates_existing_todo_successfully()
+    {
+        $todo = \App\Models\Todo::factory()->create();
+
+        $updateData = [
+            'title' => 'Updated Todo',
+            'description' => 'This is an updated todo item',
             'status' => 'completed',
         ];
 
-        $response = $this->putJson('/api/todos/' . $todo->id, $updatedData);
+        $response = $this->putJson("/api/todos/$todo->id", $updateData);
 
-        $response->assertStatus(200)
-            ->assertJsonFragment($updatedData);
+        $response->assertStatus(JsonResponse::HTTP_OK)
+            ->assertJson([
+                'success' => true,
+                'message' => null,
+                'data' => [
+                    'id' => $todo->id,
+                    'title' => 'Updated Todo',
+                    'description' => 'This is an updated todo item',
+                    'status' => 'completed',
+                ],
+            ]);
 
-        $this->assertDatabaseHas('todos', $updatedData);
+        $this->assertDatabaseHas('todos', [
+            'id' => $todo->id,
+            'title' => 'Updated Todo',
+            'description' => 'This is an updated todo item',
+            'status' => 'completed',
+        ]);
     }
 
-    /**
-     * Test updating a todo.
-     *
-     * @return void
-     */
-    public function test_set_todo_invalid_status()
+    public function test_it_returns_not_found_during_update_if_todo_does_not_exist()
     {
-        $todo = Todo::factory()->create();
+        $nonExistingId = 123;
 
-        $updatedData = [
-            'title' => 'Updated Title',
-            'description' => 'Updated Description',
-            'status' => 'rejected',
+        $updateData = [
+            'title' => 'Updated Todo',
+            'description' => 'This is an updated todo item',
+            'status' => 'completed',
         ];
 
-        $response = $this->putJson('/api/todos/' . $todo->id, $updatedData);
+        // Act: Make a PUT request to the update method with the non-existing ID
+        $response = $this->putJson("/api/todos/$nonExistingId", $updateData);
 
-        $response->assertStatus(400);
+        $response->assertStatus(JsonResponse::HTTP_NOT_FOUND)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Todo not found',
+            ]);
     }
 
-    /**
-     * Test deleting a todo.
-     *
-     * @return void
-     */
-    public function test_can_delete_todo()
+    public function test_it_deletes_existing_todo_successfully()
     {
-        $todo = Todo::factory()->create();
+        $todo = \App\Models\Todo::factory()->create();
 
-        $response = $this->deleteJson('/api/todos/' . $todo->id);
+        $response = $this->delete("/api/todos/$todo->id");
 
-        $response->assertStatus(204);
+        $response->assertStatus(JsonResponse::HTTP_NO_CONTENT);
 
         $this->assertDatabaseMissing('todos', ['id' => $todo->id]);
+    }
+
+    public function test_it_returns_not_found_during_deletion_if_todo_does_not_exist()
+    {
+        $id = 123;
+
+        $response = $this->delete("/api/todos/$id");
+
+        $response->assertStatus(JsonResponse::HTTP_NOT_FOUND)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Todo not found',
+            ]);
     }
 }
