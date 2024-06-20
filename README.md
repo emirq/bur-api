@@ -8,7 +8,7 @@ That is it.
 
 ## After git clone
 
-``` cd todo-app ```
+``` cd bur-api ```
 
 ## 1. Composer install
 
@@ -23,9 +23,9 @@ docker run --rm \
 
 ## 2. Create and start containers
 
-``` ./vendor/bin/sail up -d ```
-
 ``` cp .env.example .env ```
+
+``` ./vendor/bin/sail up -d ```
 
 ``` ./vendor/bin/sail artisan key:generate  ```
 
