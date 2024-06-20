@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('swagger');
 });
 
 Route::get('/api-docs/openapi.yml', function () {
@@ -24,8 +24,3 @@ Route::get('/api-docs/openapi.yml', function () {
 
     return $response;
 });
-
-Route::get('/api-docs', function () {
-    return view('swagger');
-});
-
