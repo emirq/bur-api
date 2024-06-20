@@ -25,6 +25,11 @@ docker run --rm \
 
 ``` ./vendor/bin/sail up -d ```
 
+``` cp .env.example .env ```
+
+``` ./vendor/bin/sail artisan key:generate  ```
+
+
 ## 3. Migrate database (if not yet)
 
 ``` ./vendor/bin/sail artisan migrate ```
