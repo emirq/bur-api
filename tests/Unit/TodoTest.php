@@ -14,7 +14,7 @@ class TodoTest extends TestCase
     public function test_it_returns_all_todos()
     {
         // Arrange
-        \App\Models\Todo::factory()->count(3)->create();
+        Todo::factory()->count(3)->create();
 
         // Act
         $response = $this->get('/api/todos');
@@ -64,7 +64,7 @@ class TodoTest extends TestCase
 
     public function test_it_shows_existing_todo()
     {
-        $todo = \App\Models\Todo::factory()->create();
+        $todo = Todo::factory()->create();
 
         $response = $this->get("/api/todos/$todo->id");
 
@@ -96,7 +96,7 @@ class TodoTest extends TestCase
 
     public function test_it_updates_existing_todo_successfully()
     {
-        $todo = \App\Models\Todo::factory()->create();
+        $todo = Todo::factory()->create();
 
         $updateData = [
             'title' => 'Updated Todo',
@@ -136,7 +136,6 @@ class TodoTest extends TestCase
             'status' => 'completed',
         ];
 
-        // Act: Make a PUT request to the update method with the non-existing ID
         $response = $this->putJson("/api/todos/$nonExistingId", $updateData);
 
         $response->assertStatus(JsonResponse::HTTP_NOT_FOUND)
@@ -148,7 +147,7 @@ class TodoTest extends TestCase
 
     public function test_it_deletes_existing_todo_successfully()
     {
-        $todo = \App\Models\Todo::factory()->create();
+        $todo = Todo::factory()->create();
 
         $response = $this->delete("/api/todos/$todo->id");
 
