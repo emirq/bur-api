@@ -46,3 +46,5 @@ docker run --rm \
 ## Analysis run on highest level possible: 9
 
 ``` [OK] No errors ```
+
+## Rector used and applied
