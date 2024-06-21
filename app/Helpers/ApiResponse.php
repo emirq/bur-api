@@ -15,7 +15,7 @@ class ApiResponse
         ], $statusCode);
     }
 
-    public static function error($message, int $statusCode = JsonResponse::HTTP_BAD_REQUEST): \Illuminate\Http\JsonResponse
+    public static function error(string $message, int $statusCode = JsonResponse::HTTP_BAD_REQUEST): \Illuminate\Http\JsonResponse
     {
         return response()->json([
             'success' => false,

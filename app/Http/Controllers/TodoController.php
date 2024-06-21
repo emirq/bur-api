@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\TodoValidationException;
 use App\Helpers\ApiResponse;
+use App\Services\TodoService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
-use App\Models\Todo;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 #[OA\Info(
     version: "1.0.0",
@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Validator;
 )]
 class TodoController extends Controller
 {
+    public function __construct(private readonly TodoService $todoService)
+    {}
+
     #[OA\Get(
         path: '/api/todos',
         description: 'Retrieve a list of all todos',
@@ -33,9 +36,11 @@ class TodoController extends Controller
             )
         ]
     )]
-    public function index(): \Illuminate\Http\JsonResponse
+    public function index(): JsonResponse
     {
-        return ApiResponse::success(Todo::all());
+        $todos = $this->todoService->all();
+
+        return ApiResponse::success($todos);
     }
 
     #[OA\Post(
@@ -63,21 +68,19 @@ class TodoController extends Controller
             new OA\Response(response: JsonResponse::HTTP_UNPROCESSABLE_ENTITY, description: 'Validation error')
         ]
     )]
-    public function store(Request $request): \Illuminate\Http\JsonResponse
+    public function store(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'required|string|in:pending,completed',
-        ]);
+        try {
+            $todo = $this->todoService->store($request);
 
-        if ($validator->fails()) {
-            return ApiResponse::validationError($validator->errors());
+            return ApiResponse::success(
+                $todo,
+                'Todo successfully created.',
+                JsonResponse::HTTP_CREATED
+            );
+        } catch (TodoValidationException $e) {
+            return ApiResponse::validationError($e->getMessage());
         }
-
-        $todo = Todo::create($request->all());
-
-        return ApiResponse::success($todo, '', JsonResponse::HTTP_CREATED);
     }
 
     #[OA\Get(
@@ -102,10 +105,10 @@ class TodoController extends Controller
             new OA\Response(response: JsonResponse::HTTP_NOT_FOUND, description: 'Todo not found')
         ]
     )]
-    public function show(int $id): \Illuminate\Http\JsonResponse
+    public function show(int $id): JsonResponse
     {
         try {
-            $todo = Todo::findOrFail($id);
+            $todo = $this->todoService->show($id);
 
             return ApiResponse::success($todo);
         } catch (ModelNotFoundException) {
@@ -146,25 +149,15 @@ class TodoController extends Controller
             new OA\Response(response: JsonResponse::HTTP_NOT_FOUND, description: 'Todo not found')
         ]
     )]
-    public function update(Request $request, int $id): \Illuminate\Http\JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|nullable|string',
-            'status' => 'sometimes|required|string|in:pending,completed',
-        ]);
-
-        if ($validator->fails()) {
-            return ApiResponse::validationError($validator->errors());
-        }
-
         try {
-            $todo = Todo::findOrFail($id);
+            $todo = $this->todoService->update($request, $id);
 
-            $todo->update($request->all());
-
-            return ApiResponse::success($todo);
-        }  catch (ModelNotFoundException) {
+            return ApiResponse::success($todo, 'Todo successfully updated.');
+        } catch(TodoValidationException $e) {
+            return ApiResponse::validationError($e->getMessage());
+        } catch (ModelNotFoundException) {
             return ApiResponse::error('Todo not found', JsonResponse::HTTP_NOT_FOUND);
         }
     }
@@ -187,14 +180,12 @@ class TodoController extends Controller
             new OA\Response(response: JsonResponse::HTTP_NOT_FOUND, description: 'Todo not found')
         ]
     )]
-    public function destroy(int $id): \Illuminate\Http\JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         try {
-            $todo = Todo::findOrFail($id);
-            $todo->delete();
+            $this->todoService->destroy($id);
 
             return ApiResponse::success([], '', JsonResponse::HTTP_NO_CONTENT);
-
         } catch (ModelNotFoundException) {
             return ApiResponse::error('Todo not found', JsonResponse::HTTP_NOT_FOUND);
         }

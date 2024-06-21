@@ -42,3 +42,13 @@ docker run --rm \
 # API Documentation
 
 ``` http://localhost ```
+
+# Code Static Analysis
+
+``` sail shell ```
+
+``` ./vendor/bin/phpstan analyse app ```
+
+## Analysis run on highest level possible: 9
+
+``` [OK] No errors ```
