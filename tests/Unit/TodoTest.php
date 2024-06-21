@@ -11,7 +11,7 @@ class TodoTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_returns_all_todos()
+    public function test_it_returns_all_todos(): void
     {
         // Arrange
         Todo::factory()->count(3)->create();
@@ -28,7 +28,7 @@ class TodoTest extends TestCase
             ->assertJsonCount(3);
     }
 
-    public function test_it_creates_a_new_todo_successfully()
+    public function test_it_creates_a_new_todo_successfully(): void
     {
         $data = [
             'title' => 'New Todo',
@@ -48,7 +48,7 @@ class TodoTest extends TestCase
         $this->assertDatabaseHas('todos', $data);
     }
 
-    public function test_it_validates_required_fields_on_store()
+    public function test_it_validates_required_fields_on_store(): void
     {
         $data = [
             // 'title' is intentionally missing
@@ -62,7 +62,7 @@ class TodoTest extends TestCase
             ->assertSee('title');
     }
 
-    public function test_it_shows_existing_todo()
+    public function test_it_shows_existing_todo(): void
     {
         $todo = Todo::factory()->create();
 
@@ -81,7 +81,7 @@ class TodoTest extends TestCase
             ]);
     }
 
-    public function test_it_returns_not_found_if_todo_not_exists()
+    public function test_it_returns_not_found_if_todo_not_exists(): void
     {
         $id = 123;
 
@@ -94,7 +94,7 @@ class TodoTest extends TestCase
             ]);
     }
 
-    public function test_it_updates_existing_todo_successfully()
+    public function test_it_updates_existing_todo_successfully(): void
     {
         $todo = Todo::factory()->create();
 
@@ -126,7 +126,7 @@ class TodoTest extends TestCase
         ]);
     }
 
-    public function test_it_returns_not_found_during_update_if_todo_does_not_exist()
+    public function test_it_returns_not_found_during_update_if_todo_does_not_exist(): void
     {
         $nonExistingId = 123;
 
@@ -145,7 +145,7 @@ class TodoTest extends TestCase
             ]);
     }
 
-    public function test_it_deletes_existing_todo_successfully()
+    public function test_it_deletes_existing_todo_successfully(): void
     {
         $todo = Todo::factory()->create();
 
@@ -156,7 +156,7 @@ class TodoTest extends TestCase
         $this->assertDatabaseMissing('todos', ['id' => $todo->id]);
     }
 
-    public function test_it_returns_not_found_during_deletion_if_todo_does_not_exist()
+    public function test_it_returns_not_found_during_deletion_if_todo_does_not_exist(): void
     {
         $id = 123;
 

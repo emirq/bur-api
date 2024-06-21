@@ -5,9 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 
-Route::get('/', function () {
-    return view('swagger');
-});
+Route::get('/', fn() => view('swagger'));
 
 Route::get('/api-docs/openapi.yml', function () {
     $path = base_path('openapi.yml');
