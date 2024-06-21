@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\TodoValidationException;
 use App\Helpers\ApiResponse;
-use App\Services\TodoService;
+use App\Services\TodoServiceInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 )]
 class TodoController extends Controller
 {
-    public function __construct(private readonly TodoService $todoService)
+    public function __construct(private readonly TodoServiceInterface $todoService)
     {}
 
     #[OA\Get(
