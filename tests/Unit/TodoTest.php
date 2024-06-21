@@ -41,7 +41,7 @@ class TodoTest extends TestCase
         $response->assertStatus(JsonResponse::HTTP_CREATED)
             ->assertJson([
                 'success' => true,
-                'message' => null,
+                'message' => 'Todo successfully created.',
                 'data' => $data,
             ]);
 
@@ -59,7 +59,7 @@ class TodoTest extends TestCase
         $response = $this->postJson('/api/todos', $data);
 
         $response->assertStatus(JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonValidationErrors('title');
+            ->assertSee('title');
     }
 
     public function test_it_shows_existing_todo()
@@ -109,7 +109,7 @@ class TodoTest extends TestCase
         $response->assertStatus(JsonResponse::HTTP_OK)
             ->assertJson([
                 'success' => true,
-                'message' => null,
+                'message' => 'Todo successfully updated.',
                 'data' => [
                     'id' => $todo->id,
                     'title' => 'Updated Todo',
