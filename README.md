@@ -48,3 +48,7 @@ docker run --rm \
 ``` [OK] No errors ```
 
 ## Rector used and applied
+
+# Troubleshoot
+
+In case port `:80` is already used, add `APP_PORT={YOUR_PORT}`, e.g. `APP_PORT=3333`
