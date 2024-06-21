@@ -2,13 +2,7 @@
 
 ``` docker ```
 
-That is it.
-
 # Installation
-
-## After git clone
-
-``` cd bur-api ```
 
 ## 1. Composer install
 
